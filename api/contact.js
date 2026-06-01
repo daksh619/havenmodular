@@ -1,4 +1,5 @@
-const RESEND_ENDPOINT = 'https://api.resend.com/emails';
+import { Resend } from 'resend';
+
 const ENQUIRY_RECIPIENT = 'hoodadaksh2003@gmail.com';
 const FROM_ADDRESS = 'Havenmodular <onboarding@resend.dev>';
 
@@ -156,21 +157,14 @@ export default async function handler(req, res) {
   if (lead.email) payload.reply_to = lead.email;
 
   try {
-    const resendResponse = await fetch(RESEND_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const { data, error } = await resend.emails.send(payload);
 
-    const result = await resendResponse.json().catch(() => ({}));
-    if (!resendResponse.ok) {
-      return sendJson(res, 502, { error: 'Failed to send email', details: result });
+    if (error) {
+      return sendJson(res, 502, { error: 'Failed to send email', details: error });
     }
 
-    return sendJson(res, 200, { ok: true, id: result.id });
+    return sendJson(res, 200, { ok: true, id: data?.id });
   } catch (error) {
     return sendJson(res, 502, { error: 'Failed to send email' });
   }
