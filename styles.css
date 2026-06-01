@@ -360,9 +360,9 @@ em { font-style: italic; color: var(--gold); }
 .cine-title em { color: var(--gold-lt); }
 .cine-sub { font-size: .87rem; color: rgba(253,251,248,.45); line-height: 1.7; }
 .cine-stage { position: relative; width: 100%; height: 80vh; min-height: 500px; max-height: 900px; overflow: hidden; perspective: 1200px; }
-.cine-slide { position: absolute; inset: 0; opacity: 0; transform: scale(1.04) rotateY(8deg); transform-origin: center; transform-style: preserve-3d; z-index: 0; backface-visibility: hidden; }
-.cine-slide.active { opacity: 1; transform: scale(1) rotateY(0deg); z-index: 2; transition: opacity .9s ease, transform 1.2s cubic-bezier(.25,.46,.45,.94); }
-.cine-slide.exit { opacity: 0; transform: scale(.96) rotateY(-8deg); z-index: 1; transition: opacity .9s ease, transform 1.2s cubic-bezier(.25,.46,.45,.94); }
+.cine-slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; pointer-events: none; transform: scale(1.04) rotateY(8deg); transform-origin: center; transform-style: preserve-3d; z-index: 0; backface-visibility: hidden; }
+.cine-slide.active { opacity: 1; visibility: visible; pointer-events: auto; transform: scale(1) rotateY(0deg); z-index: 2; transition: opacity .9s ease, transform 1.2s cubic-bezier(.25,.46,.45,.94); }
+.cine-slide.exit { opacity: 0; visibility: hidden; pointer-events: none; transform: scale(.96) rotateY(-8deg); z-index: 1; transition: opacity .9s ease, transform 1.2s cubic-bezier(.25,.46,.45,.94); }
 .cine-media { width: 100%; height: 100%; object-fit: cover; }
 .cine-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,10,10,.7) 0%, rgba(10,10,10,.2) 50%, transparent 80%); z-index: 3; pointer-events: none; }
 .cine-label-wrap { position: absolute; bottom: 5rem; left: 3rem; z-index: 5; pointer-events: none; }

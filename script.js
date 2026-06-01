@@ -84,6 +84,23 @@ window.addEventListener('scroll', () => {
   let current = 0, timer = null, paused = false;
   const DURATIONS = [7000, 5000, 7000, 5000, 5000, 5000];
 
+  function pauseSlideVideo(slide, reset = true) {
+    const vid = slide?.querySelector('video');
+    if (!vid) return;
+    vid.pause();
+    if (reset) vid.currentTime = 0;
+  }
+
+  function playSlideVideo(slide) {
+    slides.forEach(sl => {
+      if (sl !== slide) pauseSlideVideo(sl);
+    });
+    const vid = slide?.querySelector('video');
+    if (!vid) return;
+    vid.currentTime = 0;
+    vid.play().catch(() => {});
+  }
+
   function startFill(dur) {
     if (!fillBar) return;
     fillBar.style.transition = 'none'; fillBar.style.width = '0%';
@@ -107,12 +124,18 @@ window.addEventListener('scroll', () => {
     if (next === current) return;
     const prev = current; current = next;
     if (flipLayer) { flipLayer.classList.add('flash'); setTimeout(() => flipLayer.classList.remove('flash'), 180); }
+    slides.forEach((sl, i) => {
+      if (i !== prev && i !== next) {
+        sl.classList.remove('active', 'exit', 'enter-right', 'enter-left');
+        pauseSlideVideo(sl);
+      }
+    });
+    pauseSlideVideo(slides[prev]);
     slides[next].classList.add(dir === 'right' ? 'enter-right' : 'enter-left');
     requestAnimationFrame(() => requestAnimationFrame(() => {
       slides[prev].classList.add('exit'); slides[prev].classList.remove('active');
       slides[next].classList.remove('enter-right', 'enter-left'); slides[next].classList.add('active');
-      const vid = slides[next].querySelector('video');
-      if (vid) { vid.currentTime = 0; vid.play().catch(() => {}); }
+      playSlideVideo(slides[next]);
     }));
     setTimeout(() => slides[prev].classList.remove('exit'), 1300);
     updateLabels(next);
@@ -144,7 +167,12 @@ window.addEventListener('scroll', () => {
     if (Math.abs(dx) > 50) { clearTimeout(timer); dx < 0 ? goTo((current + 1) % slides.length, 'right') : goTo((current - 1 + slides.length) % slides.length, 'left'); }
   }, { passive: true });
 
-  slides.forEach((sl, i) => { const vid = sl.querySelector('video'); if (vid && i !== 0) vid.pause(); });
+  slides.forEach((sl, i) => {
+    sl.classList.toggle('active', i === current);
+    sl.classList.remove('exit', 'enter-right', 'enter-left');
+    if (i === current) playSlideVideo(sl);
+    else pauseSlideVideo(sl);
+  });
 })();
 
 // ── MULTI-STEP FORM ──────────────────────────────────────────
