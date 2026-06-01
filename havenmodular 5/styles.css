@@ -344,6 +344,10 @@ em { font-style: italic; color: var(--gold); }
 .file-upload { border: 2px dashed var(--light-grey); border-radius: 8px; padding: 2rem; text-align: center; cursor: pointer; transition: border-color var(--tr-fast); }
 .file-upload:hover { border-color: var(--forest); }
 .file-upload span { font-size: .82rem; color: var(--mid-grey); }
+.form-status { margin-top: 1rem; padding: .9rem 1rem; border-radius: 6px; font-size: .84rem; line-height: 1.5; }
+.form-status.error { background: rgba(220,38,38,.08); color: #9F1239; border: 1px solid rgba(220,38,38,.22); }
+.form-status.success { background: rgba(27,58,45,.08); color: var(--forest); border: 1px solid rgba(27,58,45,.2); }
+.btn:disabled { opacity: .65; cursor: not-allowed; transform: none; box-shadow: none; }
 
 /* Thank you */
 .thankyou-wrap { text-align: center; max-width: 560px; margin: 0 auto; padding: 6rem 0; }

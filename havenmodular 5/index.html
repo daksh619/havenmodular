@@ -912,10 +912,10 @@
           <div class="form-step-sub">Let's start with the basics. All information is kept strictly confidential.</div>
           <div class="form-row">
             <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" type="text" id="f-name" placeholder="Your full name" required></div>
-            <div class="form-group"><label class="form-label">Email Address *</label><input class="form-input" type="email" id="f-email" placeholder="your@email.com" required></div>
+            <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" id="f-email" placeholder="your@email.com"></div>
           </div>
           <div class="form-row">
-            <div class="form-group"><label class="form-label">Phone Number *</label><input class="form-input" type="tel" id="f-phone" placeholder="+353 ..."></div>
+            <div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" type="tel" id="f-phone" placeholder="+353 ..."></div>
             <div class="form-group"><label class="form-label">Eircode *</label><input class="form-input" type="text" id="f-eircode" placeholder="e.g. D06 X123"></div>
           </div>
           <div class="form-group"><label class="form-label">County *</label>
@@ -1037,8 +1037,8 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Any additional notes or questions?</label>
-            <textarea class="form-textarea" id="f-notes" placeholder="Tell us anything else that might be helpful — existing outbuildings, planning history, access concerns, etc."></textarea>
+            <label class="form-label">Message / requirements *</label>
+            <textarea class="form-textarea" id="f-notes" placeholder="Tell us anything else that might be helpful — existing outbuildings, planning history, access concerns, etc." required></textarea>
           </div>
           <div class="form-nav">
             <button class="btn btn-outline-dark" onclick="nextStep(3)">← Back</button>
@@ -1072,9 +1072,10 @@
           </div>
           <div class="form-nav">
             <button class="btn btn-outline-dark" onclick="nextStep(4)">← Back</button>
-            <button class="btn btn-gold btn-lg" onclick="submitForm()">Submit My Site Check ↗</button>
+            <button class="btn btn-gold btn-lg" id="submitSiteCheck" onclick="submitForm()">Submit My Site Check ↗</button>
           </div>
         </div>
+        <div class="form-status" id="formStatus" role="status" aria-live="polite" style="display:none"></div>
       </div>
 
       <!-- THANK YOU -->
@@ -1082,7 +1083,7 @@
         <div class="thankyou-icon">🏡</div>
         <span class="label" style="justify-content:center;display:flex">Submission Received</span>
         <h2 class="h2" style="margin-bottom:1rem">Thanks — we're<br>on it.</h2>
-        <p class="body-lg">We'll review your site details and come back with an honest next step — usually within one working day. Check your email for a confirmation.</p>
+        <p class="body-lg">Thank you. Your enquiry has been received. We’ll contact you shortly.</p>
         <div style="margin-top:2.5rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
           <a class="btn btn-primary" href="#" onclick="showPage('home')">Back to Home</a>
           <a class="btn btn-outline-dark" href="#" onclick="showPage('pricing')">Explore Pricing</a>

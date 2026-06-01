@@ -168,92 +168,84 @@ function updateStepDots() {
   });
 }
 
-function submitForm() {
+function showFormStatus(message, type) {
+  const status = document.getElementById('formStatus');
+  if (!status) return;
+  status.textContent = message;
+  status.className = 'form-status ' + (type || '');
+  status.style.display = 'block';
+}
+
+function clearFormStatus() {
+  const status = document.getElementById('formStatus');
+  if (!status) return;
+  status.textContent = '';
+  status.className = 'form-status';
+  status.style.display = 'none';
+}
+
+async function submitForm() {
+  clearFormStatus();
   const consent = document.getElementById('f-consent');
-  if (!consent?.checked) { alert('Please tick the consent checkbox to submit.'); return; }
+  if (!consent?.checked) { showFormStatus('Please tick the consent checkbox to submit.', 'error'); return; }
 
   const lead = {
     id: Date.now(),
-    name:        document.getElementById('f-name')?.value || '',
-    email:       document.getElementById('f-email')?.value || '',
-    phone:       document.getElementById('f-phone')?.value || '',
-    eircode:     document.getElementById('f-eircode')?.value || '',
-    county:      document.getElementById('f-county')?.value || '',
-    use:         document.getElementById('f-use')?.value || '',
+    name:        (document.getElementById('f-name')?.value || '').trim(),
+    email:       (document.getElementById('f-email')?.value || '').trim(),
+    phone:       (document.getElementById('f-phone')?.value || '').trim(),
+    eircode:     (document.getElementById('f-eircode')?.value || '').trim(),
+    county:      (document.getElementById('f-county')?.value || '').trim(),
+    product:     '45 sqm two-bedroom modular garden home',
+    use:         (document.getElementById('f-use')?.value || '').trim(),
     owner:       document.querySelector('input[name="owner"]:checked')?.value || '',
-    garden:      document.getElementById('f-garden')?.value || '',
+    garden:      (document.getElementById('f-garden')?.value || '').trim(),
     access:      document.querySelector('input[name="access"]:checked')?.value || '',
-    accessWidth: document.getElementById('f-access-width')?.value || '',
+    accessWidth: (document.getElementById('f-access-width')?.value || '').trim(),
     slope:       document.querySelector('input[name="slope"]:checked')?.value || '',
     water:       document.querySelector('input[name="water"]:checked')?.value || '',
     drainage:    document.querySelector('input[name="drainage"]:checked')?.value || '',
     elec:        document.querySelector('input[name="elec"]:checked')?.value || '',
-    timeline:    document.getElementById('f-timeline')?.value || '',
+    timeline:    (document.getElementById('f-timeline')?.value || '').trim(),
     budget:      document.querySelector('input[name="budget"]:checked')?.value || '',
-    notes:       document.getElementById('f-notes')?.value || '',
+    notes:       (document.getElementById('f-notes')?.value || '').trim(),
+    photoCount:  document.getElementById('f-photos')?.files?.length || 0,
+    sketchFile:  document.getElementById('f-sketch')?.files?.[0]?.name || '',
     status:      'New',
     date:        new Date().toLocaleDateString('en-IE'),
     suitability: 'Pending review',
   };
 
-  if (!lead.name || !lead.email) { alert('Please fill in your name and email.'); return; }
+  if (!lead.name) { nextStep(1); showFormStatus('Please enter your name.', 'error'); return; }
+  if (!lead.email && !lead.phone) { nextStep(1); showFormStatus('Please enter either your email address or phone number.', 'error'); return; }
+  if (!lead.notes) { nextStep(4); showFormStatus('Please add a short message or requirements before submitting.', 'error'); return; }
 
-  // Save to local admin dashboard
-  saveLead(lead);
+  const submitButton = document.getElementById('submitSiteCheck');
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = 'Sending...';
+  }
 
-  // Compose and send email via EmailJS (free tier)
-  const emailBody = `
-NEW SITE CHECKER SUBMISSION — Havenmodular
-==========================================
-Date:        ${lead.date}
-Name:        ${lead.name}
-Email:       ${lead.email}
-Phone:       ${lead.phone}
-Eircode:     ${lead.eircode}
-County:      ${lead.county}
-Owns Property: ${lead.owner}
-Intended Use:  ${lead.use}
+  try {
+    const response = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(lead)
+    });
 
-SITE DETAILS
-Garden Size:     ${lead.garden}
-Side Access:     ${lead.access}
-Access Width:    ${lead.accessWidth}
-Slope:           ${lead.slope}
+    if (!response.ok) throw new Error('Contact API failed');
 
-SERVICES
-Water nearby:    ${lead.water}
-Drainage nearby: ${lead.drainage}
-Electricity:     ${lead.elec}
-
-BUDGET & TIMELINE
-Budget:   ${lead.budget}
-Timeline: ${lead.timeline}
-
-NOTES
-${lead.notes || 'None'}
-==========================================
-  `.trim();
-
-  // Send via mailto fallback (opens email client) — replaced by backend function when deployed
-  const subject = encodeURIComponent('New Havenmodular Site Checker — ' + lead.name + ' · ' + lead.county);
-  const body    = encodeURIComponent(emailBody);
-
-  // Try to call backend email function
-  fetch('https://api.base44.com/api/apps/6a1b7af3cf322f99d2d15db5/functions/sendLead', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ to: 'hoodadaksh2003@gmail.com', subject: decodeURIComponent(subject), body: emailBody, lead })
-  }).catch(() => {
-    // Fallback: open native mail client silently
-    try {
-      const a = document.createElement('a');
-      a.href = 'mailto:hoodadaksh2003@gmail.com?subject=' + subject + '&body=' + body;
-      a.click();
-    } catch(e) {}
-  });
-
-  document.getElementById('formWrap').style.display = 'none';
-  document.getElementById('thankYouWrap').style.display = 'block';
+    saveLead(lead);
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('thankYouWrap').style.display = 'block';
+  } catch (error) {
+    showFormStatus('Something went wrong. Please try again or contact us directly on WhatsApp.', 'error');
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Submit My Site Check ↗';
+    }
+  }
 }
 
 // ── LEAD STORAGE ─────────────────────────────────────────────
