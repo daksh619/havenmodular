@@ -512,6 +512,51 @@ footer { background: var(--charcoal); color: rgba(253,251,248,.6); padding: 4rem
   .section-pad { padding: 5rem 0; }
   .nav-links { display: none; }
   .nav-hamburger { display: flex; }
+  #hero {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100svh;
+    height: auto;
+    overflow: hidden;
+    align-items: flex-end;
+    padding: 44vh 0 3rem;
+    background: var(--dark);
+  }
+  .hero-media {
+    inset: 72px 0 34vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .hero-video {
+    width: 100%;
+    height: 100%;
+    max-height: 58vh;
+    object-fit: contain;
+    object-position: center center;
+    transform: none !important;
+  }
+  .hero-overlay {
+    background: linear-gradient(to top, rgba(10,10,10,.88) 0%, rgba(10,10,10,.58) 34%, rgba(10,10,10,.14) 68%, transparent 100%);
+  }
+  .hero-content {
+    padding: 0 1.25rem;
+  }
+  .hero-eyebrow { margin-bottom: 1rem; }
+  .hero-h1 {
+    font-size: 3.15rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+  .hero-sub {
+    font-size: .92rem;
+    line-height: 1.6;
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+  .hero-scroll { display: none; }
   .overview-grid { grid-template-columns: 1fr; }
   .who-grid { grid-template-columns: 1fr; }
   .gallery-mosaic { grid-template-columns: 1fr; grid-template-rows: auto; }
@@ -554,9 +599,37 @@ footer { background: var(--charcoal); color: rgba(253,251,248,.6); padding: 4rem
   .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
   .footer-bottom { flex-direction: column; text-align: center; }
   .tech-pillars { grid-template-columns: 1fr 1fr; }
-  .cine-stage { height: 60vh; min-height: 380px; }
-  .cine-label-wrap { bottom: 4rem; left: 1.5rem; }
-  .cine-dots { right: 1.5rem; }
+  .cine-stage {
+    width: 100%;
+    height: 70vh;
+    min-height: 430px;
+    max-height: 75vh;
+    overflow: hidden;
+    background: var(--dark);
+  }
+  .cine-slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cine-media {
+    width: 100%;
+    height: 100%;
+    max-height: 75vh;
+    object-fit: contain;
+    object-position: center center;
+  }
+  .cine-overlay {
+    background: linear-gradient(to top, rgba(10,10,10,.72) 0%, rgba(10,10,10,.22) 34%, transparent 64%);
+  }
+  .cine-label-wrap {
+    bottom: 4.6rem;
+    left: 1rem;
+    right: 1rem;
+  }
+  .cine-label-tag { font-size: 1.45rem; }
+  .cine-label-sub { font-size: .62rem; line-height: 1.5; }
+  .cine-dots { right: 1rem; bottom: 1.4rem; }
   .cine-arrow { opacity: 1; width: 38px; height: 38px; }
   .cine-prev { left: .8rem; }
   .cine-next { right: .8rem; }
