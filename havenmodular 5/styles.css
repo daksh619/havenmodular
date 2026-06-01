@@ -513,6 +513,37 @@ footer { background: var(--charcoal); color: rgba(253,251,248,.6); padding: 4rem
   .gallery-mosaic { grid-template-columns: 1fr; grid-template-rows: auto; }
   .gm-card { height: 260px; }
   .gm-card-large { grid-row: auto; height: 300px; }
+  #page-gallery .swipe-gallery {
+    display: flex !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    gap: 14px !important;
+    box-sizing: border-box;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding-inline: max(0px, calc((100% - 86vw) / 2)) !important;
+    scroll-behavior: smooth;
+    scroll-padding-inline: 7vw;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  #page-gallery .swipe-gallery::-webkit-scrollbar { display: none; }
+  #page-gallery .swipe-gallery-item {
+    flex: 0 0 86vw !important;
+    grid-row: auto !important;
+    height: auto !important;
+    aspect-ratio: 4 / 3;
+    overflow: hidden !important;
+    scroll-snap-align: center;
+    scroll-snap-stop: normal;
+  }
+  #page-gallery .swipe-gallery-item img {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
   .form-row { grid-template-columns: 1fr; }
   .how-grid { grid-template-columns: 1fr; }
   .step-card::after { display: none; }
