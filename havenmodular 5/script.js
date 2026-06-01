@@ -184,7 +184,8 @@ function clearFormStatus() {
   status.style.display = 'none';
 }
 
-async function submitForm() {
+async function submitForm(event) {
+  if (event?.preventDefault) event.preventDefault();
   clearFormStatus();
   const consent = document.getElementById('f-consent');
   if (!consent?.checked) { showFormStatus('Please tick the consent checkbox to submit.', 'error'); return; }
@@ -298,7 +299,7 @@ function renderLeads() {
     <tr>
       <td><strong>${l.name || '—'}</strong></td>
       <td>${l.phone || '—'}</td>
-      <td><a href="mailto:${l.email}" style="color:var(--forest)">${l.email || '—'}</a></td>
+      <td><span style="color:var(--forest)">${l.email || '—'}</span></td>
       <td>${l.county || '—'}</td>
       <td style="font-size:.78rem">${l.use || '—'}</td>
       <td style="font-size:.78rem">${l.budget || '—'}</td>
