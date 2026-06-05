@@ -9,12 +9,23 @@ function showPage(id) {
   if (target) {
     target.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Hide footer on admin
+    // Hide public chrome on admin
+    const navEl = document.getElementById('nav');
     const footer = document.getElementById('siteFooter');
+    if (navEl) navEl.style.display = id === 'admin' ? 'none' : '';
     if (footer) footer.style.display = id === 'admin' ? 'none' : '';
   }
   if (id === 'admin') renderLeads();
 }
+
+function showHashPage() {
+  const hash = window.location.hash.replace('#', '');
+  const id = hash.startsWith('page-') ? hash.replace('page-', '') : hash;
+  if (id && document.getElementById('page-' + id)) showPage(id);
+}
+
+window.addEventListener('DOMContentLoaded', showHashPage);
+window.addEventListener('hashchange', showHashPage);
 
 // ── NAV SCROLL ───────────────────────────────────────────────
 const nav = document.getElementById('nav');

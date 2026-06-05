@@ -486,6 +486,10 @@ footer { background: var(--charcoal); color: rgba(253,251,248,.6); padding: 4rem
 /* Page switching */
 .page { display: none; }
 .page.active { display: block; }
+body:has(.page:target) .page.active:not(:target) { display: none; }
+body:has(.page:target) .page:target { display: block; }
+body:has(#page-admin:target) #nav { display: none; }
+body:has(#page-admin:target) #siteFooter { display: none; }
 
 /* Sticky nav for admin */
 .admin-sticky { position: sticky; top: 0; z-index: 50; background: var(--warm-white); border-bottom: 1px solid var(--light-grey); padding: 1rem 0; margin-bottom: 2rem; }

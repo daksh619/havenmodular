@@ -1856,6 +1856,20 @@
   </div>
 </div>
 
+<script>
+  (function () {
+    const hash = window.location.hash.replace('#', '');
+    const id = hash === 'page-admin' ? 'admin' : hash;
+    const target = document.getElementById('page-' + id);
+    if (!target) return;
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    target.classList.add('active');
+    const nav = document.getElementById('nav');
+    const footer = document.getElementById('siteFooter');
+    if (nav) nav.style.display = id === 'admin' ? 'none' : '';
+    if (footer) footer.style.display = id === 'admin' ? 'none' : '';
+  })();
+</script>
 <script src="assets.js"></script>
 <script src="script.js"></script>
 </body>
