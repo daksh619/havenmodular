@@ -1,5 +1,5 @@
 // ============================================================
-// HAVENMODULAR — Main JavaScript
+// HAVENMODULAR - Main JavaScript
 // ============================================================
 
 // ── PAGE ROUTING ─────────────────────────────────────────────
@@ -325,13 +325,13 @@ function renderLeads() {
 
   tbody.innerHTML = filtered.map(l => `
     <tr>
-      <td><strong>${l.name || '—'}</strong></td>
-      <td>${l.phone || '—'}</td>
-      <td><span style="color:var(--forest)">${l.email || '—'}</span></td>
-      <td>${l.county || '—'}</td>
-      <td style="font-size:.78rem">${l.use || '—'}</td>
-      <td style="font-size:.78rem">${l.budget || '—'}</td>
-      <td style="font-size:.78rem">${l.timeline || '—'}</td>
+      <td><strong>${l.name || '-'}</strong></td>
+      <td>${l.phone || '-'}</td>
+      <td><span style="color:var(--forest)">${l.email || '-'}</span></td>
+      <td>${l.county || '-'}</td>
+      <td style="font-size:.78rem">${l.use || '-'}</td>
+      <td style="font-size:.78rem">${l.budget || '-'}</td>
+      <td style="font-size:.78rem">${l.timeline || '-'}</td>
       <td>
         <select class="form-select" style="font-size:.72rem;padding:.3rem .5rem;width:auto;min-width:110px" onchange="updateLeadStatus(${l.id}, this.value)">
           ${['New','Contacted','Qualified','Site Visit','Quoted','Deposit','Lost'].map(s =>
@@ -340,8 +340,8 @@ function renderLeads() {
         </select>
         <span class="status-badge ${STATUS_CLASSES[l.status]||'status-new'}" style="margin-left:.4rem">${l.status}</span>
       </td>
-      <td style="font-size:.75rem;white-space:nowrap">${l.date || '—'}</td>
-      <td style="font-size:.75rem;max-width:180px;color:var(--mid-grey)">${l.notes ? l.notes.substring(0,80)+'…' : '—'}</td>
+      <td style="font-size:.75rem;white-space:nowrap">${l.date || '-'}</td>
+      <td style="font-size:.75rem;max-width:180px;color:var(--mid-grey)">${l.notes ? l.notes.substring(0,80)+'…' : '-'}</td>
     </tr>
   `).join('');
 }
