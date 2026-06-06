@@ -817,48 +817,6 @@ body:has(#page-admin:target) #siteFooter { display: none; }
 .wwb-compare-item.bad::before { content: '✗ '; color: #C0392B; font-weight: 700; }
 .wwb-compare-item.good::before { content: '✓ '; color: var(--gold-lt); font-weight: 700; }
 
-/* ── WHATSAPP FLOATING BUTTON ────────────────────────────── */
-.wa-float {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  z-index: 9999;
-  width: 56px;
-  height: 56px;
-  background: #25D366;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 20px rgba(37,211,102,.45);
-  transition: all .3s ease;
-  animation: waPop .6s 1.5s both;
-}
-.wa-float:hover {
-  transform: scale(1.12);
-  box-shadow: 0 8px 30px rgba(37,211,102,.55);
-}
-@keyframes waPop {
-  from { opacity:0; transform: scale(0.5); }
-  to   { opacity:1; transform: scale(1); }
-}
-.wa-float::before {
-  content: 'Chat with us';
-  position: absolute;
-  right: 66px;
-  background: var(--charcoal);
-  color: white;
-  font-size: .72rem;
-  font-weight: 500;
-  padding: .4rem .9rem;
-  border-radius: 20px;
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity .25s ease;
-  pointer-events: none;
-}
-.wa-float:hover::before { opacity: 1; }
-
 /* ── LIGHTBOX ────────────────────────────────────────────── */
 .lightbox-overlay {
   display: none;
@@ -889,7 +847,6 @@ body:has(#page-admin:target) #siteFooter { display: none; }
   .wwb-benefits { grid-template-columns: 1fr 1fr; }
   .wwb-compare { grid-template-columns: 1fr; }
   .wwb-panel-specs { grid-template-columns: 1fr 1fr; }
-  .wa-float { bottom: 1.2rem; right: 1.2rem; width: 50px; height: 50px; }
 }
 @media (max-width: 480px) {
   .wwb-spec-grid { grid-template-columns: 1fr; }

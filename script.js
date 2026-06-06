@@ -302,7 +302,7 @@ async function submitForm(event) {
     document.getElementById('formWrap').style.display = 'none';
     document.getElementById('thankYouWrap').style.display = 'block';
   } catch (error) {
-    showFormStatus('Something went wrong. Please try again or contact us directly on WhatsApp.', 'error');
+    showFormStatus('Something went wrong. Please try again or submit the form again shortly.', 'error');
   } finally {
     if (submitButton) {
       submitButton.disabled = false;
