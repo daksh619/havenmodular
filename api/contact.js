@@ -205,11 +205,12 @@ export default async function handler(req, res) {
   const folderName = `${timestamp}-${safeSegment(lead.name || lead.email || 'enquiry', 'enquiry')}`;
   const photoFiles = fileArray(files, PHOTO_FIELD_NAMES);
   const sketchFiles = fileArray(files, SKETCH_FIELD_NAMES);
+  const hasUploadedFiles = photoFiles.length > 0 || sketchFiles.length > 0;
   let uploadedPhotos = [];
   let uploadedSketches = [];
   let fileUploadFailed = false;
 
-  if ((photoFiles.length || sketchFiles.length) && process.env.BLOB_READ_WRITE_TOKEN) {
+  if (hasUploadedFiles && process.env.BLOB_READ_WRITE_TOKEN) {
     try {
       uploadedPhotos = await uploadFiles(photoFiles, folderName);
       uploadedSketches = await uploadFiles(sketchFiles, folderName);
@@ -217,7 +218,7 @@ export default async function handler(req, res) {
       fileUploadFailed = true;
       logError('Failed to upload contact form files to Vercel Blob', error);
     }
-  } else if (photoFiles.length || sketchFiles.length) {
+  } else if (hasUploadedFiles) {
     fileUploadFailed = true;
     console.error('BLOB_READ_WRITE_TOKEN is missing; contact form files were not uploaded.');
   }
