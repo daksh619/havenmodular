@@ -897,7 +897,7 @@
   </div>
   <section class="section-pad">
     <div class="container">
-      <div id="formWrap" class="form-wrap">
+      <form id="formWrap" class="form-wrap" onsubmit="submitForm(event)">
         <div class="step-indicator" id="stepIndicator">
           <div class="step-dot current"></div>
           <div class="step-dot"></div>
@@ -911,15 +911,15 @@
           <div class="form-step-title">About you</div>
           <div class="form-step-sub">Let's start with the basics. All information is kept strictly confidential.</div>
           <div class="form-row">
-            <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" type="text" id="f-name" placeholder="Your full name" required></div>
-            <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" id="f-email" placeholder="your@email.com"></div>
+            <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" type="text" id="f-name" name="name" placeholder="Your full name" required></div>
+            <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" id="f-email" name="email" placeholder="your@email.com"></div>
           </div>
           <div class="form-row">
-            <div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" type="tel" id="f-phone" placeholder="+353 ..."></div>
-            <div class="form-group"><label class="form-label">Eircode *</label><input class="form-input" type="text" id="f-eircode" placeholder="e.g. D06 X123"></div>
+            <div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" type="tel" id="f-phone" name="phone" placeholder="+353 ..."></div>
+            <div class="form-group"><label class="form-label">Eircode *</label><input class="form-input" type="text" id="f-eircode" name="eircode" placeholder="e.g. D06 X123"></div>
           </div>
           <div class="form-group"><label class="form-label">County *</label>
-            <select class="form-select" id="f-county">
+            <select class="form-select" id="f-county" name="county">
               <option value="">Select county...</option>
               <option>Carlow</option><option>Cavan</option><option>Clare</option><option>Cork</option><option>Donegal</option><option>Dublin</option><option>Galway</option><option>Kerry</option><option>Kildare</option><option>Kilkenny</option><option>Laois</option><option>Leitrim</option><option>Limerick</option><option>Longford</option><option>Louth</option><option>Mayo</option><option>Meath</option><option>Monaghan</option><option>Offaly</option><option>Roscommon</option><option>Sligo</option><option>Tipperary</option><option>Waterford</option><option>Westmeath</option><option>Wexford</option><option>Wicklow</option>
             </select>
@@ -932,7 +932,7 @@
             </div>
           </div>
           <div class="form-group"><label class="form-label">Intended Use *</label>
-            <select class="form-select" id="f-use">
+            <select class="form-select" id="f-use" name="use">
               <option value="">Select intended use...</option>
               <option>Adult child / independent living</option>
               <option>Elderly parent / granny flat</option>
@@ -942,7 +942,7 @@
               <option>Other</option>
             </select>
           </div>
-          <div class="form-nav"><div></div><button class="btn btn-primary" onclick="nextStep(2)">Next: Your Site →</button></div>
+          <div class="form-nav"><div></div><button type="button" class="btn btn-primary" onclick="nextStep(2)">Next: Your Site →</button></div>
         </div>
 
         <!-- STEP 2 -->
@@ -950,7 +950,7 @@
           <div class="form-step-title">Your site</div>
           <div class="form-step-sub">Help us understand your garden and access so we can give you an accurate assessment.</div>
           <div class="form-group"><label class="form-label">Approximate Garden Size</label>
-            <select class="form-select" id="f-garden">
+            <select class="form-select" id="f-garden" name="garden">
               <option value="">Select size...</option>
               <option>Under 50 sqm</option><option>50–100 sqm</option><option>100–200 sqm</option><option>200–500 sqm</option><option>Over 500 sqm</option>
             </select>
@@ -963,7 +963,7 @@
             </div>
           </div>
           <div class="form-group"><label class="form-label">Approximate side access width (if known)</label>
-            <select class="form-select" id="f-access-width">
+            <select class="form-select" id="f-access-width" name="accessWidth">
               <option value="">Select...</option>
               <option>Under 2m</option><option>2m–2.5m</option><option>2.5m–3m</option><option>3m+</option><option>Not sure</option>
             </select>
@@ -977,8 +977,8 @@
             </div>
           </div>
           <div class="form-nav">
-            <button class="btn btn-outline-dark" onclick="nextStep(1)">← Back</button>
-            <button class="btn btn-primary" onclick="nextStep(3)">Next: Services →</button>
+            <button type="button" class="btn btn-outline-dark" onclick="nextStep(1)">← Back</button>
+            <button type="button" class="btn btn-primary" onclick="nextStep(3)">Next: Services →</button>
           </div>
         </div>
 
@@ -1008,8 +1008,8 @@
             </div>
           </div>
           <div class="form-nav">
-            <button class="btn btn-outline-dark" onclick="nextStep(2)">← Back</button>
-            <button class="btn btn-primary" onclick="nextStep(4)">Next: Budget →</button>
+            <button type="button" class="btn btn-outline-dark" onclick="nextStep(2)">← Back</button>
+            <button type="button" class="btn btn-primary" onclick="nextStep(4)">Next: Budget →</button>
           </div>
         </div>
 
@@ -1018,7 +1018,7 @@
           <div class="form-step-title">Budget &amp; timeline</div>
           <div class="form-step-sub">No commitment. It just helps us tailor our response to your situation.</div>
           <div class="form-group"><label class="form-label">Desired Timeline</label>
-            <select class="form-select" id="f-timeline">
+            <select class="form-select" id="f-timeline" name="timeline">
               <option value="">Select...</option>
               <option>As soon as possible</option>
               <option>Within 3 months</option>
@@ -1038,11 +1038,11 @@
           </div>
           <div class="form-group">
             <label class="form-label">Message / requirements *</label>
-            <textarea class="form-textarea" id="f-notes" placeholder="Tell us anything else that might be helpful: existing outbuildings, planning history, access concerns, etc." required></textarea>
+            <textarea class="form-textarea" id="f-notes" name="notes" placeholder="Tell us anything else that might be helpful: existing outbuildings, planning history, access concerns, etc." required></textarea>
           </div>
           <div class="form-nav">
-            <button class="btn btn-outline-dark" onclick="nextStep(3)">← Back</button>
-            <button class="btn btn-primary" onclick="nextStep(5)">Next: Upload Photos →</button>
+            <button type="button" class="btn btn-outline-dark" onclick="nextStep(3)">← Back</button>
+            <button type="button" class="btn btn-primary" onclick="nextStep(5)">Next: Upload Photos →</button>
           </div>
         </div>
 
@@ -1053,30 +1053,30 @@
           <div class="form-group">
             <label class="form-label">Upload garden photos (optional)</label>
             <label class="file-upload">
-              <input type="file" accept="image/*" multiple style="display:none" id="f-photos">
+              <input type="file" accept="image/*" multiple style="display:none" id="f-photos" name="photos">
               <span>📷 Click to upload garden photos (JPG, PNG)</span>
             </label>
           </div>
           <div class="form-group">
             <label class="form-label">Upload site sketch (optional)</label>
             <label class="file-upload">
-              <input type="file" accept="image/*,.pdf" style="display:none" id="f-sketch">
+              <input type="file" accept="image/*,.pdf" style="display:none" id="f-sketch" name="sketch">
               <span>📐 Click to upload a sketch or site drawing (optional)</span>
             </label>
           </div>
           <div class="form-group">
             <label class="form-check">
-              <input type="checkbox" id="f-consent" required>
+              <input type="checkbox" id="f-consent" name="consent" required>
               <span>I consent to Havenmodular contacting me about my enquiry. I understand this is not a binding commitment and my details will not be shared with third parties. *</span>
             </label>
           </div>
           <div class="form-nav">
-            <button class="btn btn-outline-dark" onclick="nextStep(4)">← Back</button>
+            <button type="button" class="btn btn-outline-dark" onclick="nextStep(4)">← Back</button>
             <button class="btn btn-gold btn-lg" id="submitSiteCheck" type="button" onclick="submitForm(event)">Submit My Site Check ↗</button>
           </div>
         </div>
         <div class="form-status" id="formStatus" role="status" aria-live="polite" style="display:none"></div>
-      </div>
+      </form>
 
       <!-- THANK YOU -->
       <div class="thankyou-wrap" id="thankYouWrap" style="display:none">

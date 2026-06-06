@@ -1,7 +1,20 @@
+import { createReadStream } from 'node:fs';
+import { unlink } from 'node:fs/promises';
+import formidable from 'formidable';
+import { put } from '@vercel/blob';
 import { Resend } from 'resend';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 const ENQUIRY_RECIPIENT = 'hoodadaksh2003@gmail.com';
 const FROM_ADDRESS = 'Havenmodular <onboarding@resend.dev>';
+const FILE_FIELD_NAMES = new Set(['photos', 'gardenPhotos', 'sitePhotos', 'sketch', 'sketchFile']);
+const PHOTO_FIELD_NAMES = new Set(['photos', 'gardenPhotos', 'sitePhotos']);
+const SKETCH_FIELD_NAMES = new Set(['sketch', 'sketchFile']);
 
 function sendJson(res, statusCode, payload) {
   res.statusCode = statusCode;
@@ -10,7 +23,8 @@ function sendJson(res, statusCode, payload) {
 }
 
 function clean(value, maxLength = 2000) {
-  return String(value || '').trim().slice(0, maxLength);
+  const first = Array.isArray(value) ? value[0] : value;
+  return String(first || '').trim().slice(0, maxLength);
 }
 
 function escapeHtml(value) {
@@ -31,14 +45,84 @@ function row(label, value) {
   `;
 }
 
-async function readBody(req) {
-  if (req.body && typeof req.body === 'object') return req.body;
-  if (typeof req.body === 'string') return JSON.parse(req.body || '{}');
+function fileArray(files, names) {
+  return Object.entries(files || {})
+    .filter(([field]) => names.has(field))
+    .flatMap(([, value]) => Array.isArray(value) ? value : [value])
+    .filter(file => file && file.size > 0);
+}
 
-  const chunks = [];
-  for await (const chunk of req) chunks.push(chunk);
-  const raw = Buffer.concat(chunks).toString('utf8');
-  return raw ? JSON.parse(raw) : {};
+function safeSegment(value, fallback = 'file') {
+  return String(value || fallback)
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9._-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80) || fallback;
+}
+
+function parseMultipart(req) {
+  const form = formidable({
+    multiples: true,
+    keepExtensions: true,
+    maxFileSize: 12 * 1024 * 1024,
+    maxTotalFileSize: 60 * 1024 * 1024,
+    filter: part => {
+      if (!part.mimetype) return true;
+      if (!FILE_FIELD_NAMES.has(part.name)) return false;
+      return part.mimetype.startsWith('image/') || part.mimetype === 'application/pdf';
+    },
+  });
+
+  return new Promise((resolve, reject) => {
+    form.parse(req, (error, fields, files) => {
+      if (error) reject(error);
+      else resolve({ fields, files });
+    });
+  });
+}
+
+async function uploadFiles(files, lead, folderName) {
+  const uploaded = [];
+
+  for (const [index, file] of files.entries()) {
+    const originalName = safeSegment(file.originalFilename || file.newFilename || `upload-${index + 1}`);
+    const pathname = `leads/${folderName}/${originalName}`;
+    const stream = createReadStream(file.filepath);
+
+    const blob = await put(pathname, stream, {
+      access: 'public',
+      contentType: file.mimetype || 'application/octet-stream',
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
+
+    uploaded.push({
+      name: file.originalFilename || originalName,
+      url: blob.url,
+    });
+
+    try {
+      await unlink(file.filepath);
+    } catch {
+      // Temporary upload cleanup is best effort on serverless storage.
+    }
+  }
+
+  return uploaded;
+}
+
+function fileLinksHtml(files, emptyMessage, label) {
+  if (!files.length) return `<p>${escapeHtml(emptyMessage)}</p>`;
+  return `
+    <ol>
+      ${files.map(file => `<li><a href="${escapeHtml(file.url)}">${escapeHtml(label)}: ${escapeHtml(file.name)}</a></li>`).join('')}
+    </ol>
+  `;
+}
+
+function fileLinksText(files, emptyMessage, label) {
+  if (!files.length) return emptyMessage;
+  return files.map((file, index) => `${index + 1}. ${label}: ${file.url}`).join('\n');
 }
 
 export default async function handler(req, res) {
@@ -51,39 +135,56 @@ export default async function handler(req, res) {
     return sendJson(res, 500, { error: 'Email service is not configured' });
   }
 
-  let body;
-  try {
-    body = await readBody(req);
-  } catch (error) {
-    return sendJson(res, 400, { error: 'Invalid JSON body' });
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return sendJson(res, 500, { error: 'File upload service is not configured' });
   }
 
+  let parsed;
+  try {
+    parsed = await parseMultipart(req);
+  } catch {
+    return sendJson(res, 400, { error: 'Invalid multipart form data' });
+  }
+
+  const { fields, files } = parsed;
   const lead = {
-    name: clean(body.name, 120),
-    email: clean(body.email, 180),
-    phone: clean(body.phone, 80),
-    eircode: clean(body.eircode, 40),
-    county: clean(body.county, 80),
-    product: clean(body.product, 160) || '45 sqm two-bedroom modular garden home',
-    use: clean(body.use, 160),
-    owner: clean(body.owner, 80),
-    garden: clean(body.garden, 120),
-    access: clean(body.access, 80),
-    accessWidth: clean(body.accessWidth, 80),
-    slope: clean(body.slope, 80),
-    water: clean(body.water, 80),
-    drainage: clean(body.drainage, 80),
-    elec: clean(body.elec, 80),
-    timeline: clean(body.timeline, 120),
-    budget: clean(body.budget, 120),
-    notes: clean(body.notes, 4000),
-    photoCount: clean(body.photoCount, 20),
-    sketchFile: clean(body.sketchFile, 180),
+    name: clean(fields.name, 120),
+    email: clean(fields.email, 180),
+    phone: clean(fields.phone, 80),
+    eircode: clean(fields.eircode, 40),
+    county: clean(fields.county, 80),
+    product: clean(fields.product, 160) || '45 sqm two-bedroom modular garden home',
+    use: clean(fields.use, 160),
+    owner: clean(fields.owner, 80),
+    garden: clean(fields.garden, 120),
+    access: clean(fields.access, 80),
+    accessWidth: clean(fields.accessWidth, 80),
+    slope: clean(fields.slope, 80),
+    water: clean(fields.water, 80),
+    drainage: clean(fields.drainage, 80),
+    elec: clean(fields.elec, 80),
+    timeline: clean(fields.timeline, 120),
+    budget: clean(fields.budget, 120),
+    notes: clean(fields.notes, 4000),
   };
 
   if (!lead.name) return sendJson(res, 400, { error: 'Name is required' });
   if (!lead.email && !lead.phone) return sendJson(res, 400, { error: 'Email or phone is required' });
   if (!lead.notes) return sendJson(res, 400, { error: 'Message is required' });
+
+  const timestamp = Date.now();
+  const folderName = `${timestamp}-${safeSegment(lead.name || lead.email || 'enquiry', 'enquiry')}`;
+  const photoFiles = fileArray(files, PHOTO_FIELD_NAMES);
+  const sketchFiles = fileArray(files, SKETCH_FIELD_NAMES);
+  let uploadedPhotos = [];
+  let uploadedSketches = [];
+
+  try {
+    uploadedPhotos = await uploadFiles(photoFiles, lead, folderName);
+    uploadedSketches = await uploadFiles(sketchFiles, lead, folderName);
+  } catch {
+    return sendJson(res, 502, { error: 'Failed to upload enquiry files' });
+  }
 
   const location = [lead.eircode, lead.county].filter(Boolean).join(', ');
   const subjectParts = ['New Havenmodular enquiry', lead.name, lead.county].filter(Boolean);
@@ -112,9 +213,11 @@ export default async function handler(req, res) {
         ${row('Electricity nearby', lead.elec)}
         ${row('Timeline', lead.timeline)}
         ${row('Budget', lead.budget)}
-        ${row('Garden photo count', lead.photoCount)}
-        ${row('Site sketch filename', lead.sketchFile)}
       </table>
+      <h2 style="font-size:18px;margin:24px 0 8px;">Uploaded Garden Photos</h2>
+      ${fileLinksHtml(uploadedPhotos, 'No garden photos were uploaded with this enquiry.', 'View photo')}
+      <h2 style="font-size:18px;margin:24px 0 8px;">Sketch / Site Plan</h2>
+      ${fileLinksHtml(uploadedSketches, 'No sketch or site plan was uploaded with this enquiry.', 'View sketch')}
     </div>
   `;
 
@@ -142,8 +245,12 @@ export default async function handler(req, res) {
     `Electricity nearby: ${lead.elec || '-'}`,
     `Timeline: ${lead.timeline || '-'}`,
     `Budget: ${lead.budget || '-'}`,
-    `Garden photo count: ${lead.photoCount || 0}`,
-    `Site sketch filename: ${lead.sketchFile || '-'}`,
+    '',
+    'Uploaded Garden Photos:',
+    fileLinksText(uploadedPhotos, 'No garden photos were uploaded with this enquiry.', 'View photo'),
+    '',
+    'Sketch / Site Plan:',
+    fileLinksText(uploadedSketches, 'No sketch or site plan was uploaded with this enquiry.', 'View sketch'),
   ].join('\n');
 
   const payload = {
@@ -164,8 +271,13 @@ export default async function handler(req, res) {
       return sendJson(res, 502, { error: 'Failed to send email', details: error });
     }
 
-    return sendJson(res, 200, { ok: true, id: data?.id });
-  } catch (error) {
+    return sendJson(res, 200, {
+      ok: true,
+      id: data?.id,
+      uploadedPhotos: uploadedPhotos.map(file => file.url),
+      uploadedSketches: uploadedSketches.map(file => file.url),
+    });
+  } catch {
     return sendJson(res, 502, { error: 'Failed to send email' });
   }
-};
+}

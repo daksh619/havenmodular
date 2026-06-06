@@ -267,10 +267,30 @@ async function submitForm(event) {
   }
 
   try {
+    const form = document.getElementById('formWrap');
+    const formData = new FormData(form);
+    Object.entries(lead).forEach(([key, value]) => {
+      if (key !== 'photoCount' && key !== 'sketchFile') {
+        formData.set(key, value == null ? '' : String(value));
+      }
+    });
+
+    const photoInput = document.getElementById('f-photos');
+    formData.delete('photos');
+    Array.from(photoInput?.files || []).forEach(file => {
+      formData.append('photos', file, file.name);
+    });
+
+    const sketchInput = document.getElementById('f-sketch');
+    const sketch = sketchInput?.files?.[0];
+    formData.delete('sketch');
+    if (sketch) {
+      formData.append('sketch', sketch, sketch.name);
+    }
+
     const response = await fetch('/api/contact', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(lead)
+      body: formData
     });
 
     if (!response.ok) throw new Error('Contact API failed');
