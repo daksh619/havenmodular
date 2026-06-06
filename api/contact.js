@@ -1,5 +1,4 @@
-import { createReadStream } from 'node:fs';
-import { unlink } from 'node:fs/promises';
+import { readFile, unlink } from 'node:fs/promises';
 import formidable from 'formidable';
 import { put } from '@vercel/blob';
 import { Resend } from 'resend';
@@ -20,6 +19,15 @@ function sendJson(res, statusCode, payload) {
   res.statusCode = statusCode;
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify(payload));
+}
+
+function logError(message, error) {
+  console.error(message, {
+    name: error?.name,
+    message: error?.message,
+    stack: error?.stack,
+    code: error?.code,
+  });
 }
 
 function clean(value, maxLength = 2000) {
@@ -82,15 +90,15 @@ function parseMultipart(req) {
   });
 }
 
-async function uploadFiles(files, lead, folderName) {
+async function uploadFiles(files, folderName) {
   const uploaded = [];
 
   for (const [index, file] of files.entries()) {
     const originalName = safeSegment(file.originalFilename || file.newFilename || `upload-${index + 1}`);
-    const pathname = `leads/${folderName}/${originalName}`;
-    const stream = createReadStream(file.filepath);
+    const pathname = `leads/${folderName}/${String(index + 1).padStart(2, '0')}-${originalName}`;
+    const fileBody = await readFile(file.filepath);
 
-    const blob = await put(pathname, stream, {
+    const blob = await put(pathname, fileBody, {
       access: 'public',
       contentType: file.mimetype || 'application/octet-stream',
       token: process.env.BLOB_READ_WRITE_TOKEN,
@@ -111,7 +119,8 @@ async function uploadFiles(files, lead, folderName) {
   return uploaded;
 }
 
-function fileLinksHtml(files, emptyMessage, label) {
+function fileLinksHtml(files, emptyMessage, label, uploadFailed = false) {
+  if (uploadFailed) return '<p><strong>File upload failed.</strong> The customer submitted files, but they could not be uploaded to Vercel Blob. Check Vercel function logs for the exact error.</p>';
   if (!files.length) return `<p>${escapeHtml(emptyMessage)}</p>`;
   return `
     <ol>
@@ -120,30 +129,50 @@ function fileLinksHtml(files, emptyMessage, label) {
   `;
 }
 
-function fileLinksText(files, emptyMessage, label) {
+function fileLinksText(files, emptyMessage, label, uploadFailed = false) {
+  if (uploadFailed) return 'File upload failed. The customer submitted files, but they could not be uploaded to Vercel Blob. Check Vercel function logs for the exact error.';
   if (!files.length) return emptyMessage;
   return files.map((file, index) => `${index + 1}. ${label}: ${file.url}`).join('\n');
+}
+
+async function readJsonBody(req) {
+  if (req.body && typeof req.body === 'object') return req.body;
+  if (typeof req.body === 'string') return JSON.parse(req.body || '{}');
+
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  const raw = Buffer.concat(chunks).toString('utf8');
+  return raw ? JSON.parse(raw) : {};
+}
+
+async function parseRequest(req) {
+  const contentType = req.headers['content-type'] || '';
+
+  if (contentType.includes('multipart/form-data')) {
+    return parseMultipart(req);
+  }
+
+  const fields = await readJsonBody(req);
+  return { fields, files: {} };
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    return sendJson(res, 405, { error: 'Method not allowed' });
+    return sendJson(res, 405, { success: false, error: 'Method not allowed' });
   }
 
   if (!process.env.RESEND_API_KEY) {
-    return sendJson(res, 500, { error: 'Email service is not configured' });
-  }
-
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return sendJson(res, 500, { error: 'File upload service is not configured' });
+    console.error('RESEND_API_KEY is missing; contact form email cannot be sent.');
+    return sendJson(res, 500, { success: false, error: 'Email service is not configured' });
   }
 
   let parsed;
   try {
-    parsed = await parseMultipart(req);
-  } catch {
-    return sendJson(res, 400, { error: 'Invalid multipart form data' });
+    parsed = await parseRequest(req);
+  } catch (error) {
+    logError('Failed to parse contact form request', error);
+    return sendJson(res, 400, { success: false, error: 'Invalid form submission' });
   }
 
   const { fields, files } = parsed;
@@ -168,9 +197,9 @@ export default async function handler(req, res) {
     notes: clean(fields.notes, 4000),
   };
 
-  if (!lead.name) return sendJson(res, 400, { error: 'Name is required' });
-  if (!lead.email && !lead.phone) return sendJson(res, 400, { error: 'Email or phone is required' });
-  if (!lead.notes) return sendJson(res, 400, { error: 'Message is required' });
+  if (!lead.name) return sendJson(res, 400, { success: false, error: 'Name is required' });
+  if (!lead.email && !lead.phone) return sendJson(res, 400, { success: false, error: 'Email or phone is required' });
+  if (!lead.notes) return sendJson(res, 400, { success: false, error: 'Message is required' });
 
   const timestamp = Date.now();
   const folderName = `${timestamp}-${safeSegment(lead.name || lead.email || 'enquiry', 'enquiry')}`;
@@ -178,12 +207,19 @@ export default async function handler(req, res) {
   const sketchFiles = fileArray(files, SKETCH_FIELD_NAMES);
   let uploadedPhotos = [];
   let uploadedSketches = [];
+  let fileUploadFailed = false;
 
-  try {
-    uploadedPhotos = await uploadFiles(photoFiles, lead, folderName);
-    uploadedSketches = await uploadFiles(sketchFiles, lead, folderName);
-  } catch {
-    return sendJson(res, 502, { error: 'Failed to upload enquiry files' });
+  if ((photoFiles.length || sketchFiles.length) && process.env.BLOB_READ_WRITE_TOKEN) {
+    try {
+      uploadedPhotos = await uploadFiles(photoFiles, folderName);
+      uploadedSketches = await uploadFiles(sketchFiles, folderName);
+    } catch (error) {
+      fileUploadFailed = true;
+      logError('Failed to upload contact form files to Vercel Blob', error);
+    }
+  } else if (photoFiles.length || sketchFiles.length) {
+    fileUploadFailed = true;
+    console.error('BLOB_READ_WRITE_TOKEN is missing; contact form files were not uploaded.');
   }
 
   const location = [lead.eircode, lead.county].filter(Boolean).join(', ');
@@ -215,9 +251,9 @@ export default async function handler(req, res) {
         ${row('Budget', lead.budget)}
       </table>
       <h2 style="font-size:18px;margin:24px 0 8px;">Uploaded Garden Photos</h2>
-      ${fileLinksHtml(uploadedPhotos, 'No garden photos were uploaded with this enquiry.', 'View photo')}
+      ${fileLinksHtml(uploadedPhotos, 'No garden photos were uploaded with this enquiry.', 'View photo', fileUploadFailed)}
       <h2 style="font-size:18px;margin:24px 0 8px;">Sketch / Site Plan</h2>
-      ${fileLinksHtml(uploadedSketches, 'No sketch or site plan was uploaded with this enquiry.', 'View sketch')}
+      ${fileLinksHtml(uploadedSketches, 'No sketch or site plan was uploaded with this enquiry.', 'View sketch', fileUploadFailed)}
     </div>
   `;
 
@@ -247,10 +283,10 @@ export default async function handler(req, res) {
     `Budget: ${lead.budget || '-'}`,
     '',
     'Uploaded Garden Photos:',
-    fileLinksText(uploadedPhotos, 'No garden photos were uploaded with this enquiry.', 'View photo'),
+    fileLinksText(uploadedPhotos, 'No garden photos were uploaded with this enquiry.', 'View photo', fileUploadFailed),
     '',
     'Sketch / Site Plan:',
-    fileLinksText(uploadedSketches, 'No sketch or site plan was uploaded with this enquiry.', 'View sketch'),
+    fileLinksText(uploadedSketches, 'No sketch or site plan was uploaded with this enquiry.', 'View sketch', fileUploadFailed),
   ].join('\n');
 
   const payload = {
@@ -268,16 +304,19 @@ export default async function handler(req, res) {
     const { data, error } = await resend.emails.send(payload);
 
     if (error) {
-      return sendJson(res, 502, { error: 'Failed to send email', details: error });
+      console.error('Resend failed to send contact form email', error);
+      return sendJson(res, 502, { success: false, error: 'Failed to send enquiry email' });
     }
 
     return sendJson(res, 200, {
-      ok: true,
+      success: true,
       id: data?.id,
       uploadedPhotos: uploadedPhotos.map(file => file.url),
       uploadedSketches: uploadedSketches.map(file => file.url),
+      fileUploadFailed,
     });
-  } catch {
-    return sendJson(res, 502, { error: 'Failed to send email' });
+  } catch (error) {
+    logError('Unhandled contact form email error', error);
+    return sendJson(res, 502, { success: false, error: 'Failed to send enquiry email' });
   }
 }

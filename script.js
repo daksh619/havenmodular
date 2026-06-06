@@ -292,8 +292,11 @@ async function submitForm(event) {
       method: 'POST',
       body: formData
     });
+    const result = await response.json().catch(() => ({}));
 
-    if (!response.ok) throw new Error('Contact API failed');
+    if (!response.ok || result.success !== true) {
+      throw new Error(result.error || 'Contact API failed');
+    }
 
     saveLead(lead);
     document.getElementById('formWrap').style.display = 'none';
