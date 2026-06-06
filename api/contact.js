@@ -206,11 +206,14 @@ export default async function handler(req, res) {
   const photoFiles = fileArray(files, PHOTO_FIELD_NAMES);
   const sketchFiles = fileArray(files, SKETCH_FIELD_NAMES);
   const hasUploadedFiles = photoFiles.length > 0 || sketchFiles.length > 0;
+  const hasBlobToken = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
   let uploadedPhotos = [];
   let uploadedSketches = [];
   let fileUploadFailed = false;
 
-  if (hasUploadedFiles && process.env.BLOB_READ_WRITE_TOKEN) {
+  console.log('Blob token present:', hasBlobToken);
+
+  if (hasUploadedFiles && hasBlobToken) {
     try {
       uploadedPhotos = await uploadFiles(photoFiles, folderName);
       uploadedSketches = await uploadFiles(sketchFiles, folderName);
@@ -220,7 +223,7 @@ export default async function handler(req, res) {
     }
   } else if (hasUploadedFiles) {
     fileUploadFailed = true;
-    console.error('BLOB_READ_WRITE_TOKEN is missing; contact form files were not uploaded.');
+    console.warn('BLOB_READ_WRITE_TOKEN is missing; contact form files were not uploaded.');
   }
 
   const location = [lead.eircode, lead.county].filter(Boolean).join(', ');
