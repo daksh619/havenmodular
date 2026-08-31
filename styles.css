@@ -980,6 +980,8 @@ body:has(#page-admin:target) #siteFooter { display: none; }
   .wpc-card-hero { grid-template-columns: 1fr; }
   .wpc-product-preview { aspect-ratio: 16 / 10; }
   .wpc-finish-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .custom-project-card { grid-template-columns: 1fr !important; }
+  .custom-project-card .btn { max-width: 100%; white-space: normal !important; text-align: center; justify-content: center; }
 }
 @media (max-width: 480px) {
   .wwb-spec-grid { grid-template-columns: 1fr; }
