@@ -332,6 +332,19 @@ body:has(#page-admin:target) .whatsapp-contact {
 .pricing-card.featured .pricing-list li::before { color: var(--gold); }
 .pricing-note { font-size: .7rem; color: var(--mid-grey); line-height: 1.6; font-style: italic; margin-top: 1rem; }
 .pricing-card.featured .pricing-note { color: rgba(253,251,248,.4); }
+.pricing-intro-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; }
+.founder-badge { display: inline-flex; align-items: center; justify-content: center; background: rgba(184,149,106,.14); color: var(--gold-lt); border: 1px solid rgba(184,149,106,.42); border-radius: 999px; padding: .55rem .9rem; font-size: .62rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; }
+.founder-badge-dark { color: var(--forest); background: rgba(27,58,45,.06); border-color: rgba(27,58,45,.16); margin-top: .2rem; }
+.founder-offer-card { box-shadow: inset 0 0 0 1px rgba(184,149,106,.22); z-index: 1; }
+.founder-expected-price { display: inline-block; font-family: var(--serif); font-size: 1.55rem; color: rgba(253,251,248,.52); line-height: 1; margin: 0 0 1.4rem; text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: rgba(184,149,106,.78); }
+.founder-current-price { font-size: clamp(3.1rem,5vw,4.7rem); margin-bottom: .25rem; letter-spacing: 0; }
+.founder-vat-label { font-size: .7rem; color: var(--gold-lt); letter-spacing: .18em; text-transform: uppercase; margin-bottom: 1.2rem; }
+.founder-product-desc { color: rgba(253,251,248,.72); font-size: .86rem; line-height: 1.65; margin-bottom: 1.2rem; }
+.founder-highlight { background: rgba(253,251,248,.08); border: 1px solid rgba(184,149,106,.28); border-radius: 6px; padding: .85rem 1rem; color: var(--cream); font-size: .8rem; line-height: 1.55; margin-bottom: 1.35rem; }
+.founder-cta-row { display: flex; flex-direction: column; gap: .75rem; margin-bottom: 1rem; }
+.pricing-option-price,
+.pricing-option-note { display: block; color: var(--gold); font-size: .7rem; font-weight: 600; margin-top: .2rem; }
+.pricing-option-note { color: var(--mid-grey); font-weight: 500; }
 
 /* Compliance section */
 .compliance-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
@@ -570,7 +583,10 @@ body:has(#page-admin:target) #siteFooter { display: none; }
 @media (max-width: 1024px) {
   .container { padding: 0 28px; }
   .overview-grid { grid-template-columns: repeat(2,1fr); }
-  .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+  .pricing-grid { grid-template-columns: 1fr 1fr; max-width: 900px; margin: 0 auto; }
+  .founder-offer-card { order: 1; grid-column: 1 / -1; justify-self: center; width: min(100%, 520px); }
+  .founder-included-card { order: 2; }
+  .founder-options-card { order: 3; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .tech-pillars { grid-template-columns: repeat(2,1fr); }
   .how-grid { grid-template-columns: repeat(2,1fr); }
@@ -586,6 +602,11 @@ body:has(#page-admin:target) #siteFooter { display: none; }
 @media (max-width: 768px) {
   .container { padding: 0 20px; }
   .section-pad { padding: 5rem 0; }
+  .pricing-intro-row { flex-direction: column; gap: 1rem; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 100%; }
+  .founder-offer-card { grid-column: auto; width: 100%; }
+  .founder-current-price { font-size: clamp(2.8rem,16vw,4rem); }
+  .founder-badge { white-space: normal; text-align: center; }
   .whatsapp-contact {
     right: calc(20px + env(safe-area-inset-right));
     bottom: calc(22px + env(safe-area-inset-bottom));

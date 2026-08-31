@@ -2,13 +2,96 @@
 // HAVENMODULAR - Main JavaScript
 // ============================================================
 
+// ── FOUNDER ACCESS COMMERCIAL CONFIG ─────────────────────────
+const founderAccess = Object.freeze({
+  programmeName: 'Founder Access Programme',
+  productName: 'Haven 45 Founder Access',
+  currentPriceInclVat: 79449,
+  expectedStandardPriceInclVat: 97000,
+  totalApprovedProjects: 5,
+  bespokeLayoutPriceInclVat: 1135,
+  currency: 'EUR',
+  vatIncluded: true,
+});
+
+window.founderAccess = founderAccess;
+
+function formatFounderPrice(amount) {
+  return new Intl.NumberFormat('en-IE', {
+    style: 'currency',
+    currency: founderAccess.currency,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+function setFounderText(selector, value) {
+  document.querySelectorAll(selector).forEach(el => {
+    el.textContent = value;
+  });
+}
+
+function applyFounderAccessContent() {
+  const currentPrice = formatFounderPrice(founderAccess.currentPriceInclVat);
+  const expectedPrice = formatFounderPrice(founderAccess.expectedStandardPriceInclVat);
+  const layoutPrice = formatFounderPrice(founderAccess.bespokeLayoutPriceInclVat);
+
+  setFounderText('[data-founder-current-price]', currentPrice);
+  setFounderText('[data-founder-expected-price]', expectedPrice);
+  setFounderText('[data-founder-layout-price]', layoutPrice);
+  setFounderText('[data-founder-total-projects]', founderAccess.totalApprovedProjects);
+
+  const description = `${founderAccess.productName}: ${currentPrice} including VAT for a 45 sqm two-bedroom modular garden home in Ireland.`;
+  document.title = `${founderAccess.productName} | ${currentPrice} including VAT | Havenmodular`;
+
+  const metaDescription = document.querySelector('meta[name="description"]');
+  if (metaDescription) metaDescription.setAttribute('content', description);
+
+  const ogTitle = document.querySelector('meta[property="og:title"]');
+  if (ogTitle) ogTitle.setAttribute('content', `${founderAccess.productName} | Havenmodular`);
+
+  const ogDescription = document.querySelector('meta[property="og:description"]');
+  if (ogDescription) ogDescription.setAttribute('content', description);
+
+  const pageUrl = window.location.origin && window.location.origin !== 'null'
+    ? `${window.location.origin}${window.location.pathname}#page-pricing`
+    : 'https://havenmodular.ie/#page-pricing';
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: founderAccess.productName,
+    brand: {
+      '@type': 'Brand',
+      name: 'Havenmodular',
+    },
+    description: 'Standard Haven 45, a 45 sqm two-bedroom modular garden home with Founder Access launch-phase pricing.',
+    offers: {
+      '@type': 'Offer',
+      price: founderAccess.currentPriceInclVat,
+      priceCurrency: founderAccess.currency,
+      url: pageUrl,
+    },
+  };
+
+  let schemaEl = document.getElementById('founder-access-schema');
+  if (!schemaEl) {
+    schemaEl = document.createElement('script');
+    schemaEl.type = 'application/ld+json';
+    schemaEl.id = 'founder-access-schema';
+    document.head.appendChild(schemaEl);
+  }
+  schemaEl.textContent = JSON.stringify(schema);
+}
+
+document.addEventListener('DOMContentLoaded', applyFounderAccessContent);
+
 // ── PAGE ROUTING ─────────────────────────────────────────────
-function showPage(id) {
+function showPage(id, options = {}) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const target = document.getElementById('page-' + id);
   if (target) {
     target.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (options.scroll !== false) window.scrollTo({ top: 0, behavior: 'smooth' });
     // Hide public chrome on admin
     const navEl = document.getElementById('nav');
     const footer = document.getElementById('siteFooter');
@@ -26,6 +109,15 @@ function showHashPage() {
 
 window.addEventListener('DOMContentLoaded', showHashPage);
 window.addEventListener('hashchange', showHashPage);
+
+function scrollToPricingInclusions(event) {
+  if (event) event.preventDefault();
+  showPage('pricing', { scroll: false });
+  requestAnimationFrame(() => {
+    const inclusions = document.getElementById('pricing-inclusions');
+    if (inclusions) inclusions.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
 
 // ── NAV SCROLL ───────────────────────────────────────────────
 const nav = document.getElementById('nav');
@@ -384,7 +476,7 @@ function addSampleLead() {
   const names = ['Aoife Murphy','Ciarán O\'Brien','Sinéad Walsh','Pádraig Ryan','Niamh Kelly'];
   const counties = ['Dublin','Cork','Galway','Limerick','Wicklow','Kildare','Meath'];
   const uses = ['Elderly parent / granny flat','Adult child / independent living','Guest suite'];
-  const budgets = ['€90,000 – €120,000','€70,000 – €90,000','€120,000+'];
+  const budgets = ['Founder Access budget','Above standard Haven 45 budget','Flexible for the right project'];
   const statuses = ['New','Contacted','Qualified'];
   const l = {
     id: Date.now(),
@@ -397,7 +489,7 @@ function addSampleLead() {
     garden: '100–200 sqm',
     timeline: 'Within 6 months',
     budget: budgets[Math.floor(Math.random()*budgets.length)],
-    notes: 'Interested in the Classic package. Garden is mostly flat with good side access.',
+    notes: 'Interested in Founder Access. Garden is mostly flat with good side access.',
     status: statuses[Math.floor(Math.random()*statuses.length)],
     date: new Date().toLocaleDateString('en-IE'),
     suitability: 'Pending review',
