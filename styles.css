@@ -348,6 +348,19 @@ body:has(#page-admin:target) .whatsapp-contact {
 .pricing-option-note { display: block; color: var(--gold); font-size: .7rem; font-weight: 600; margin-top: .2rem; }
 .pricing-option-note { color: var(--mid-grey); font-weight: 500; }
 
+/* Finish options */
+.finish-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem; }
+.finish-card { background: var(--cream); border-radius: 12px; padding: 2rem; border: 1px solid var(--light-grey); }
+.wpc-card-hero { display: grid; grid-template-columns: minmax(0,1fr) minmax(150px,.65fr); gap: 1.5rem; align-items: center; margin-bottom: 1.6rem; }
+.wpc-product-preview { border-radius: 10px; overflow: hidden; background: var(--charcoal); border: 1px solid rgba(184,149,106,.26); box-shadow: 0 14px 42px rgba(10,10,10,.14); aspect-ratio: 4 / 3; }
+.wpc-product-preview img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.wpc-finish-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: .85rem; }
+.wpc-finish-option { min-width: 0; background: rgba(253,251,248,.64); border: 1px solid rgba(184,149,106,.18); border-radius: 8px; padding: .55rem; transition: transform var(--tr-fast), border-color var(--tr-fast), box-shadow var(--tr-fast); }
+.wpc-finish-option:hover { transform: translateY(-2px); border-color: rgba(184,149,106,.42); box-shadow: 0 12px 30px rgba(10,10,10,.08); }
+.wpc-finish-option img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 6px; border: 1px solid rgba(28,28,30,.08); margin-bottom: .55rem; }
+.wpc-finish-option span { display: block; color: var(--charcoal); font-size: .7rem; font-weight: 600; line-height: 1.3; text-align: center; }
+.wpc-finish-note { font-size: .72rem; color: var(--mid-grey); line-height: 1.6; font-style: italic; margin-top: 1rem; }
+
 /* Compliance section */
 .compliance-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
 .compliance-badge { display: inline-flex; align-items: center; gap: .6rem; background: rgba(27,58,45,.08); border: 1px solid rgba(27,58,45,.15); border-radius: 6px; padding: .6rem 1rem; margin-bottom: 1.5rem; }
@@ -957,14 +970,20 @@ body:has(#page-admin:target) #siteFooter { display: none; }
   .wwb-panel-wrap-rev { direction: ltr; }
   .wwb-panel-img-col { position: static; }
   .wwb-wall-system-img img { max-height: none; }
+  .finish-options-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
   .wwb-spec-grid { grid-template-columns: 1fr 1fr; }
   .wwb-benefits { grid-template-columns: 1fr 1fr; }
   .wwb-compare { grid-template-columns: 1fr; }
   .wwb-panel-specs { grid-template-columns: 1fr 1fr; }
+  .wpc-card-hero { grid-template-columns: 1fr; }
+  .wpc-product-preview { aspect-ratio: 16 / 10; }
+  .wpc-finish-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 @media (max-width: 480px) {
   .wwb-spec-grid { grid-template-columns: 1fr; }
   .wwb-benefits { grid-template-columns: 1fr; }
+  .finish-card { padding: 1.35rem; }
+  .wpc-finish-grid { gap: .65rem; }
 }
