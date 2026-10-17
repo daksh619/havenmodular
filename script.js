@@ -498,35 +498,11 @@ function addSampleLead() {
   renderLeads();
 }
 
-// Each selector owns its image, description and layout-specific details.
-document.querySelectorAll('[data-layout-selector]').forEach(section => {
-  const image = section.querySelector('[data-layout-image]');
-  const link = section.querySelector('[data-layout-image-link]');
-  const description = section.querySelector('[data-layout-description]');
-
-  function selectLayout(key) {
-    const layout = HAVEN_LAYOUTS[key];
-    if (!layout) return;
-    image.width = layout.width;
-    image.height = layout.height;
-    image.alt = layout.alt;
-    image.src = layout.preview;
-    link.href = layout.full;
-    link.setAttribute('aria-label', `Enlarge ${layout.label}`);
-    description.textContent = layout.description;
-    section.querySelectorAll('[data-layout-details]').forEach(details => {
-      details.hidden = details.dataset.layoutDetails !== key;
-    });
-  }
-
-  section.querySelectorAll('.fp-layout-selector input').forEach(input => {
-    input.addEventListener('change', () => selectLayout(input.value));
-  });
-  selectLayout(section.querySelector('.fp-layout-selector input:checked').value);
+document.querySelectorAll('[data-layout-image-link]').forEach(link => {
   link.addEventListener('click', event => {
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
-    openLightbox(link.href, image.alt, link);
+    openLightbox(link.href, link.querySelector('img').alt, link);
   });
 });
 
