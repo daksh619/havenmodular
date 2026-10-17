@@ -498,18 +498,80 @@ function addSampleLead() {
   renderLeads();
 }
 
+// Each selector owns its image, description and layout-specific details.
+document.querySelectorAll('[data-layout-selector]').forEach(section => {
+  const image = section.querySelector('[data-layout-image]');
+  const link = section.querySelector('[data-layout-image-link]');
+  const description = section.querySelector('[data-layout-description]');
+
+  function selectLayout(key) {
+    const layout = HAVEN_LAYOUTS[key];
+    if (!layout) return;
+    image.width = layout.width;
+    image.height = layout.height;
+    image.alt = layout.alt;
+    image.src = layout.preview;
+    link.href = layout.full;
+    link.setAttribute('aria-label', `Enlarge ${layout.label}`);
+    description.textContent = layout.description;
+    section.querySelectorAll('[data-layout-details]').forEach(details => {
+      details.hidden = details.dataset.layoutDetails !== key;
+    });
+  }
+
+  section.querySelectorAll('.fp-layout-selector input').forEach(input => {
+    input.addEventListener('change', () => selectLayout(input.value));
+  });
+  selectLayout(section.querySelector('.fp-layout-selector input:checked').value);
+  link.addEventListener('click', event => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    openLightbox(link.href, image.alt, link);
+  });
+});
+
 // ── LIGHTBOX ─────────────────────────────────────────────────
-function openLightbox(src) {
+let lightboxTrigger = null;
+let lightboxPreviousOverflow = '';
+
+function openLightbox(src, alt = 'Enlarged Haven Modular image', trigger = document.activeElement) {
   const overlay = document.getElementById('lightboxOverlay');
   const img = document.getElementById('lightboxImg');
   if (!overlay || !img) return;
+  if (!overlay.open) {
+    lightboxTrigger = trigger;
+    lightboxPreviousOverflow = document.body.style.overflow;
+  }
+  toggleLightboxZoom(false);
   img.src = src;
-  overlay.classList.add('open');
+  img.alt = alt;
+  overlay.showModal();
   document.body.style.overflow = 'hidden';
 }
 function closeLightbox() {
   const overlay = document.getElementById('lightboxOverlay');
-  if (overlay) overlay.classList.remove('open');
-  document.body.style.overflow = '';
+  if (overlay?.open) overlay.close();
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+function toggleLightboxZoom(force) {
+  const viewport = document.getElementById('lightboxViewport');
+  const button = document.getElementById('lightboxZoom');
+  const zoomed = typeof force === 'boolean' ? force : !viewport.classList.contains('is-zoomed');
+  viewport.classList.toggle('is-zoomed', zoomed);
+  viewport.scrollTop = 0;
+  viewport.scrollLeft = 0;
+  button.setAttribute('aria-pressed', String(zoomed));
+  button.setAttribute('aria-label', zoomed ? 'Zoom out' : 'Zoom in');
+  button.title = zoomed ? 'Zoom out' : 'Zoom in';
+  button.querySelector('span').textContent = zoomed ? '-' : '+';
+}
+
+const lightbox = document.getElementById('lightboxOverlay');
+lightbox.addEventListener('close', () => {
+  document.body.style.overflow = lightboxPreviousOverflow;
+  if (lightboxTrigger?.isConnected) lightboxTrigger.focus({ preventScroll: true });
+  lightboxTrigger = null;
+});
+lightbox.addEventListener('click', event => {
+  if (event.target === lightbox || event.target.id === 'lightboxViewport') closeLightbox();
+});

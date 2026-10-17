@@ -203,14 +203,32 @@
     <div class="container">
       <span class="label">The Layout</span>
       <h2 class="h2" style="margin-bottom:3rem">45 sqm that <em>lives larger</em><br>than it measures.</h2>
-      <div class="fp-reveal reveal">
+      <div class="fp-reveal reveal" data-layout-selector>
         <div>
-          <div class="fp-img-wrap">
-            <img src="https://base44.app/api/apps/6a1b7af3cf322f99d2d15db5/files/mp/public/6a1b7af3cf322f99d2d15db5/408177db9_32f6ba25b_image_1780250513566_617515d2.png" alt="45sqm Two-Bedroom Modular Garden Home, 3D Layout">
+          <fieldset class="fp-layout-selector">
+            <legend class="label">Choose your layout</legend>
+            <div class="fp-layout-options">
+              <label class="fp-layout-option"><input type="radio" name="home-layout" value="kitchen-island" aria-controls="home-layout-preview home-layout-details" checked><span>Layout 1 &mdash; Kitchen Island</span></label>
+              <label class="fp-layout-option"><input type="radio" name="home-layout" value="existing" aria-controls="home-layout-preview home-layout-details"><span>Layout 2 &mdash; Existing Layout</span></label>
+            </div>
+          </fieldset>
+          <div id="home-layout-preview">
+            <a class="fp-img-wrap fp-plan-link" href="assets/floorplans/haven-45-kitchen-island.png" target="_blank" rel="noopener noreferrer" aria-label="Enlarge Layout 1: Kitchen Island" aria-haspopup="dialog" data-layout-image-link>
+              <img src="assets/floorplans/haven-45-kitchen-island.webp" width="900" height="1125" loading="lazy" decoding="async" alt="Layout 1: two bedrooms on the left with a bathroom between them; kitchen island, dining and living space on the right" data-layout-image>
+            </a>
+            <p class="fp-layout-description" data-layout-description aria-live="polite">A two-bedroom arrangement with a kitchen island, a dedicated dining space and an open-plan living area.</p>
           </div>
         </div>
-        <div>
-          <div class="fp-schedule">
+        <div id="home-layout-details">
+          <div class="fp-schedule" data-layout-details="kitchen-island">
+            <div class="fp-schedule-title">Layout 1 &middot; Kitchen Island</div>
+            <div class="fp-features-list fp-layout-features">
+              <div class="fp-feat">Two bedrooms on the left, with a bathroom between them</div>
+              <div class="fp-feat">Kitchen island with seating</div>
+              <div class="fp-feat">Dedicated dining space and open-plan living on the right</div>
+            </div>
+          </div>
+          <div class="fp-schedule" data-layout-details="existing" hidden>
             <div class="fp-schedule-title">Area Schedule · 7.5m × 6.0m</div>
             <div class="fp-row"><span>Living / Dining / Kitchen</span><span>18.4 sq m</span></div>
             <div class="fp-row"><span>Bedroom 1</span><span>10.3 sq m</span></div>
@@ -448,15 +466,33 @@
 
   <section class="section-pad">
     <div class="container">
-      <div class="fp-reveal reveal">
+      <div class="fp-reveal reveal" data-layout-selector>
         <div>
-          <div class="fp-img-wrap">
-            <img src="https://base44.app/api/apps/6a1b7af3cf322f99d2d15db5/files/mp/public/6a1b7af3cf322f99d2d15db5/408177db9_32f6ba25b_image_1780250513566_617515d2.png" alt="45sqm Two-Bedroom Modular Garden Home, 3D Layout">
+          <fieldset class="fp-layout-selector">
+            <legend class="label">Choose your layout</legend>
+            <div class="fp-layout-options">
+              <label class="fp-layout-option"><input type="radio" name="model-layout" value="kitchen-island" aria-controls="model-layout-preview model-layout-details" checked><span>Layout 1 &mdash; Kitchen Island</span></label>
+              <label class="fp-layout-option"><input type="radio" name="model-layout" value="existing" aria-controls="model-layout-preview model-layout-details"><span>Layout 2 &mdash; Existing Layout</span></label>
+            </div>
+          </fieldset>
+          <div id="model-layout-preview">
+            <a class="fp-img-wrap fp-plan-link" href="assets/floorplans/haven-45-kitchen-island.png" target="_blank" rel="noopener noreferrer" aria-label="Enlarge Layout 1: Kitchen Island" aria-haspopup="dialog" data-layout-image-link>
+              <img src="assets/floorplans/haven-45-kitchen-island.webp" width="900" height="1125" loading="lazy" decoding="async" alt="Layout 1: two bedrooms on the left with a bathroom between them; kitchen island, dining and living space on the right" data-layout-image>
+            </a>
+            <p class="fp-layout-description" data-layout-description aria-live="polite">A two-bedroom arrangement with a kitchen island, a dedicated dining space and an open-plan living area.</p>
           </div>
           <p style="font-size:.68rem;color:var(--mid-grey);margin-top:.8rem;font-style:italic">Layout and decorative furnishings are shown for illustration. The Founder Access standard specification includes two beds with mattresses and two fitted wardrobes. Final furniture positions, finishes and dimensions are confirmed in the agreed project specification.</p>
         </div>
-        <div>
-          <div class="fp-schedule">
+        <div id="model-layout-details">
+          <div class="fp-schedule" data-layout-details="kitchen-island">
+            <div class="fp-schedule-title">Layout 1 &middot; Kitchen Island</div>
+            <div class="fp-features-list fp-layout-features">
+              <div class="fp-feat">Two bedrooms on the left, with a bathroom between them</div>
+              <div class="fp-feat">Kitchen island with seating</div>
+              <div class="fp-feat">Dedicated dining space and open-plan living on the right</div>
+            </div>
+          </div>
+          <div class="fp-schedule" data-layout-details="existing" hidden>
             <div class="fp-schedule-title">Area Schedule · 7.5m × 6.0m · 45 sqm</div>
             <div class="fp-row"><span>Living / Dining / Kitchen</span><span>18.4 sq m</span></div>
             <div class="fp-row"><span>Bedroom 1</span><span>10.3 sq m</span></div>
@@ -1786,12 +1822,17 @@
 </a>
 
 <!-- Lightbox -->
-<div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox()">
+<dialog class="lightbox-overlay" id="lightboxOverlay" aria-label="Enlarged image">
   <div class="lightbox-content">
-    <img src="" alt="" id="lightboxImg">
-    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <div class="lightbox-toolbar">
+      <button type="button" class="lightbox-zoom" id="lightboxZoom" aria-label="Zoom in" title="Zoom in" aria-pressed="false" onclick="toggleLightboxZoom()"><span aria-hidden="true">+</span></button>
+      <button type="button" class="lightbox-close" aria-label="Close enlarged image" title="Close" onclick="closeLightbox()" autofocus>✕</button>
+    </div>
+    <div class="lightbox-viewport" id="lightboxViewport" tabindex="0" role="region" aria-label="Enlarged image, scroll when zoomed">
+      <img alt="" id="lightboxImg">
+    </div>
   </div>
-</div>
+</dialog>
 
 <script>
   (function () {

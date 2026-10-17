@@ -289,6 +289,17 @@ body:has(#page-admin:target) .whatsapp-contact {
 .fp-reveal { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
 .fp-img-wrap { border-radius: 10px; overflow: hidden; box-shadow: 0 8px 60px rgba(0,0,0,.1); border: 1px solid var(--light-grey); }
 .fp-img-wrap img { width: 100%; height: auto; }
+.fp-layout-selector { min-width: 0; border: 0; margin-bottom: 1.2rem; }
+.fp-layout-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+.fp-layout-option { display: flex; align-items: center; gap: .6rem; min-height: 52px; padding: .85rem .9rem; border: 1.5px solid var(--light-grey); border-radius: 3px; font-size: .76rem; font-weight: 500; line-height: 1.5; letter-spacing: 0; cursor: pointer; transition: background var(--tr-fast), border-color var(--tr-fast); }
+.fp-layout-option input { flex-shrink: 0; width: 16px; height: 16px; accent-color: var(--forest); }
+.fp-layout-option:has(input:checked) { background: var(--forest); border-color: var(--forest); color: var(--cream); }
+.fp-layout-option:hover { border-color: var(--gold); }
+.fp-layout-option:has(input:focus-visible), .fp-plan-link:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
+.fp-plan-link { display: block; cursor: zoom-in; }
+.fp-plan-link img { width: 100%; height: auto; object-fit: contain; }
+.fp-layout-description { font-size: .88rem; line-height: 1.7; margin-top: 1rem; color: var(--charcoal); }
+.fp-schedule .fp-layout-features { margin-top: 0; }
 .fp-schedule { background: var(--forest); color: var(--cream); border-radius: 10px; padding: 2.5rem; }
 .fp-schedule-title { font-size: .65rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,.08); }
 .fp-row { display: flex; justify-content: space-between; padding: .7rem 0; border-bottom: 1px solid rgba(255,255,255,.06); font-size: .82rem; }
@@ -954,12 +965,26 @@ body:has(#page-admin:target) #siteFooter { display: none; }
   align-items: center;
   justify-content: center;
   cursor: zoom-out;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  overflow: hidden;
 }
-.lightbox-overlay.open { display: flex; }
-.lightbox-content { position: relative; max-width: 90vw; max-height: 90vh; }
-.lightbox-content img { max-width: 90vw; max-height: 88vh; object-fit: contain; border-radius: 6px; box-shadow: 0 20px 80px rgba(0,0,0,.5); }
-.lightbox-close { position: absolute; top: -2.5rem; right: 0; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; opacity: .7; transition: opacity .2s; }
-.lightbox-close:hover { opacity: 1; }
+.lightbox-overlay[open] { display: flex; }
+.lightbox-overlay::backdrop { background: rgba(0,0,0,.75); }
+.lightbox-content { display: flex; flex-direction: column; gap: .75rem; width: 100%; height: 100%; min-width: 0; }
+.lightbox-toolbar { display: flex; justify-content: flex-end; gap: .5rem; flex-shrink: 0; }
+.lightbox-viewport { display: flex; flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.lightbox-content img { flex: none; margin: auto; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; box-shadow: 0 20px 80px rgba(0,0,0,.5); cursor: default; }
+.lightbox-viewport.is-zoomed img { max-width: none; max-height: none; }
+.lightbox-close, .lightbox-zoom { display: grid; place-items: center; width: 44px; height: 44px; background: var(--forest); border: 1px solid var(--gold); border-radius: 3px; color: white; font-size: 1.5rem; cursor: pointer; transition: background .2s; }
+.lightbox-close:hover, .lightbox-zoom:hover { background: var(--forest-lt); }
+.lightbox-close:focus-visible, .lightbox-zoom:focus-visible, .lightbox-viewport:focus-visible { outline: 2px solid var(--gold-lt); outline-offset: 2px; }
 
 /* ── RESPONSIVE WHAT WE BUILD ────────────────────────────── */
 @media (max-width: 1024px) {
